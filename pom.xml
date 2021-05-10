@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.camunda.bpm.getstarted</groupId>
+  <artifactId>campaignNext-spring-boot</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.0.2.RELEASE</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <dependencies>
+  <dependency>
+	  <groupId>org.camunda.bpm.springboot</groupId>
+	  <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+	  <version>3.0.0</version>
+  </dependency>  
+  <dependency>
+      <groupId>org.camunda.bpm.springboot</groupId>
+      <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+  <dependency>
+      <groupId>org.camunda.bpm.springboot</groupId>
+      <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+  </dependencies>
+  
+   <build>
+   <resources>
+            <resource>
+                <directory>src/main/webapp</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    <plugins>
+    	<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <version>1.6</version>
+    <executions>
+      <execution>
+        <id>repack</id>
+        <phase>compile</phase>
+        <goals>
+          <goal>run</goal>
+        </goals>
+        <configuration>
+          <target>
+            <!-- note that here we reference previously declared dependency -->
+            <delete dir="${project.build.directory}/tmp"/>
+            <unzip src="${org.camunda.bpm.webapp:camunda-webapp-webjar:jar}" dest="${project.build.directory}/tmp"/>
+            
+            <copy file="./src/main/resources/user-styles.css" tofile="${project.build.directory}/tmp/META-INF/resources/app/tasklist/styles/user-styles.css" />
+            <copy file="./src/main/resources/user-styles.css" tofile="${project.build.directory}/tmp/META-INF/resources/app/welcome/styles/user-styles.css" />
+            <copy file="./src/main/resources/user-styles.css" tofile="${project.build.directory}/tmp/META-INF/resources/app/cockpit/styles/user-styles.css" />
+            <copy file="./src/main/resources/user-styles.css" tofile="${project.build.directory}/tmp/META-INF/resources/app/admin/styles/user-styles.css" />
+            <copy file="./src/main/resources/config.js" tofile="${project.build.directory}/tmp/META-INF/resources/app/tasklist/scripts/config.js" />         
+            
+            <!-- now do what you need to any of unpacked files under target/tmp/ -->
+            <zip basedir="${project.build.directory}/tmp" destfile="${org.camunda.bpm.webapp:camunda-webapp-webjar:jar}"/>
+            <delete dir="${project.build.directory}/tmp"/>
+            <!-- now the modified jar is available  -->
+          </target>
+        </configuration>
+      </execution>
+    </executions>
+  </plugin>
+  
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <layout>ZIP</layout>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
